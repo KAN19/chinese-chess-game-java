@@ -10,6 +10,24 @@ public class Move {
     int desCol;
     int desRow;
 
+    public Move(Side side, int orgCol, int orgRow, int desCol, int desRow) {
+        this.side = side;
+        this.orgCol = orgCol;
+        this.orgRow = orgRow;
+        this.desCol = desCol;
+        this.desRow = desRow;
+    }
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "orgCol=" + orgCol +
+                ", orgRow=" + orgRow +
+                ", desCol=" + desCol +
+                ", desRow=" + desRow +
+                "}\n";
+    }
+
     public Side getSide() {
         return side;
     }

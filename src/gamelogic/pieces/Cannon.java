@@ -2,6 +2,9 @@ package gamelogic.pieces;
 
 import gamelogic.board.Board;
 import gamelogic.board.Side;
+import gamelogic.player.Move;
+
+import java.util.List;
 
 public class Cannon extends Piece {
 
@@ -10,7 +13,23 @@ public class Cannon extends Piece {
     }
 
     @Override
-    public boolean canMoveTo(Board board, int desCol, int desRow) {
+    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
+        if (!isAlliance(desCol, desRow, board)) {
+            if (board.pieceAt(desCol, desRow) == null) {
+                return isStraight(desCol, desRow)
+                        && numPiecesBetween(desCol, desRow, board) == 0
+                        && board.canMoveWithoutBeingChecked(this.col, this.row, desCol, desRow);
+            } else {
+                return isStraight(desCol, desRow)
+                        && numPiecesBetween(desCol, desRow, board) == 1
+                        && board.canMoveWithoutBeingChecked(this.col, this.row, desCol, desRow);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canMove(Board board, int desCol, int desRow) {
         if (!isAlliance(desCol, desRow, board)) {
             if (board.pieceAt(desCol, desRow) == null) {
                 return isStraight(desCol, desRow)
@@ -21,5 +40,10 @@ public class Cannon extends Piece {
             }
         }
         return false;
+    }
+
+    @Override
+    public List<Move> calculatePossibleMoves(Board board) {
+        return null;
     }
 }

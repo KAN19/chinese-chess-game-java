@@ -155,7 +155,7 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println(xyToColRow(e.getPoint()));
+//        System.out.println(xyToColRow(e.getPoint()));
         Point clickedCoordinate = xyToColRow(e.getPoint());
         if (selectingPiece == null) {
             selectingPiece = game.getBoard().pieceAt(clickedCoordinate.x, clickedCoordinate.y);

@@ -13,10 +13,6 @@ public class Board {
     private final Piece redGeneral;
     private final Piece blackGeneral;
 
-    public Set<Piece> getPieces() {
-        return pieces;
-    }
-
     public Board() {
         redGeneral = new General(4, 0, Side.RED, "red-general");
         blackGeneral = new General(4, 9, Side.BLACK, "black-general");
@@ -24,8 +20,8 @@ public class Board {
         pieces.add(blackGeneral);
 
         for (int i = 0; i < 2; i++) {
-            pieces.add(new Chariot( i * 8, 0, Side.RED, "red-chariot"));
-            pieces.add(new Chariot( i * 8, 9, Side.BLACK, "black-chariot"));
+            pieces.add(new Chariot(i * 8, 0, Side.RED, "red-chariot"));
+            pieces.add(new Chariot(i * 8, 9, Side.BLACK, "black-chariot"));
 
             pieces.add(new Knight(1 + i * 6, 0, Side.RED, "red-knight"));
             pieces.add(new Knight(1 + i * 6, 9, Side.BLACK, "black-knight"));
@@ -41,11 +37,14 @@ public class Board {
         }
 
         for (int i = 0; i < 5; i++) {
-            pieces.add(new Soldier( i * 2, 3, Side.RED, "red-soldier"));
+            pieces.add(new Soldier(i * 2, 3, Side.RED, "red-soldier"));
             pieces.add(new Soldier(i * 2, 6, Side.BLACK, "black-soldier"));
         }
     }
 
+    public Set<Piece> getPieces() {
+        return pieces;
+    }
 
     public Piece pieceAt(int col, int row) {
         for (Piece piece : pieces) {
@@ -56,8 +55,61 @@ public class Board {
         return null;
     }
 
+    public boolean onMovingPiece(Side currentTurn, int orgCol, int orgRow, int desCol, int desRow) {
+
+        Piece movingP = this.pieceAt(orgCol, orgRow);
+        Piece targetP = this.pieceAt(desCol, desRow);
+
+        if (movingP == null || currentTurn != movingP.getSide()) return false;
+
+        if (movingP.canMoveWithCheckGeneral(this, desCol, desRow)) {
+            if (targetP != null) {
+                pieces.remove(targetP);
+            }
+            movingP.setCol(desCol);
+            movingP.setRow(desRow);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean canMoveWithoutBeingChecked(int orgCol, int orgRow, int desCol, int desRow) {
+        boolean result = false;
+
+        Piece movingP = this.pieceAt(orgCol, orgRow);
+        Piece targetP = this.pieceAt(desCol, desRow);
+
+        if (targetP != null) {
+            pieces.remove(targetP);
+        }
+        movingP.setCol(desCol);
+        movingP.setRow(desRow);
+
+        General currentTurnGeneral = (General) this.getGeneral(movingP.getSide());
+        if (!currentTurnGeneral
+                .isAnyEnemyCanMoveTo(this,
+                        currentTurnGeneral.getCol(),
+                        currentTurnGeneral.getRow())) {
+           result = true;
+        }
+
+        revertLastMove(movingP, targetP, orgCol, orgRow);
+
+        return result;
+    }
+
+    private void revertLastMove(Piece movedPiece, Piece targetP, int orgCol, int orgRow) {
+        movedPiece.setCol(orgCol);
+        movedPiece.setRow(orgRow);
+        if (targetP != null) {
+            pieces.add(targetP);
+        }
+    }
+
     public void removePieceAt(Piece targetP) {
-        if (targetP == null ){
+        if (targetP == null) {
             return;
         }
         this.pieces.remove(targetP);
@@ -84,7 +136,7 @@ public class Board {
         for (int row = 0; row < GameConstant.BOARD_ROWS; row++) {
             brdStr.append(row);
             for (int col = 0; col < GameConstant.BOARD_COLS; col++) {
-                Piece piece = pieceAt(col,row);
+                Piece piece = pieceAt(col, row);
                 if (piece == null) {
                     brdStr.append(" . ");
                 } else {

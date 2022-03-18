@@ -7,6 +7,7 @@ import gamelogic.pieces.Piece;
 import gamelogic.player.Move;
 import gamelogic.player.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
@@ -16,7 +17,7 @@ public class Game {
     Player player2;
     Side turn = Side.RED;
     GameStatus gameStatus;
-    List<Move> redPossibleMoves;
+    List<Move> redPossibleMoves ;
     List<Move> blackPossibleMoves;
 
     public Game() {
@@ -24,25 +25,27 @@ public class Game {
         this.player1 = new Player(this.board, Side.RED);
         this.player2 = new Player(this.board, Side.BLACK);
         gameStatus = GameStatus.PLAYING;
+        redPossibleMoves = new ArrayList<>();
+        blackPossibleMoves = new ArrayList<>();
     }
 
     public void movePiece(int orgCol, int orgRow, int desCol, int desRow) {
 
-        Piece movingP = board.pieceAt(orgCol, orgRow);
-        Piece targetP = board.pieceAt(desCol, desRow);
-
-        if (movingP == null || movingP.getSide() != turn) return;
-
-        if (doTheMoveAction(movingP, desCol, desRow)) {
-
-            checkGameStatus();
-            //Co van de xiu
-            if (isSuicide()) {
-                revertLastMove(movingP, targetP, orgCol, orgRow);
-            } else {
-                changeTheTurn();
-            }
+        if (board.onMovingPiece(turn ,orgCol, orgRow, desCol, desRow)) {
+            shiftTurn();
         }
+
+//        if (doTheMoveAction(movingP, desCol, desRow)) {
+//
+//            checkGameStatus();
+//            //Co van de xiu
+//            if (isSuicide()) {
+//                revertLastMove(movingP, targetP, orgCol, orgRow);
+//            } else {
+//                changeTheTurn();
+//            }
+//            updatePossibleMoves();
+//        }
     }
 
     private boolean isSuicide() {
@@ -53,7 +56,7 @@ public class Game {
     private boolean doTheMoveAction(Piece movingP, int desCol, int desRow) {
         Piece targetP = board.pieceAt(desCol, desRow);
 
-        if (movingP.canMoveTo(board, desCol, desRow)) {
+        if (movingP.canMoveWithCheckGeneral(board, desCol, desRow)) {
             if (targetP != null) {
                 board.removePieceAt(targetP);
             }
@@ -74,7 +77,7 @@ public class Game {
         }
     }
 
-    private void changeTheTurn() {
+    private void shiftTurn() {
         this.turn = this.turn == Side.RED ? Side.BLACK : Side.RED;
     }
 
@@ -97,8 +100,22 @@ public class Game {
     }
 
 
-    public boolean updatePossibleMoves() {
-        return false;
+    private void updatePossibleMoves() {
+        redPossibleMoves.clear();
+        blackPossibleMoves.clear();
+
+        for (Piece piece : board.getPieces()) {
+            List<Move> piecePossibleMoves = piece.calculatePossibleMoves(board);
+            if (piecePossibleMoves != null) {
+                if (piece.getSide() == Side.RED) {
+                    redPossibleMoves.addAll(piecePossibleMoves);
+                } else {
+                    blackPossibleMoves.addAll(piecePossibleMoves);
+                }
+            }
+        }
+        System.out.println("Red" + redPossibleMoves);
+        System.out.println("Black" + blackPossibleMoves);
     }
 
     public Board getBoard() {

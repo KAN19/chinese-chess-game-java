@@ -2,13 +2,16 @@ package gamelogic.pieces;
 
 import gamelogic.board.Board;
 import gamelogic.board.Side;
+import gamelogic.player.Move;
+
+import java.util.List;
 
 public abstract class Piece {
 
-    private Side side;
-    private String imgName;
-    private int col;
-    private int row;
+    protected Side side;
+    protected String imgName;
+    protected int col;
+    protected int row;
 
     public Piece(int col, int row, Side side, String imgName) {
         this.side = side;
@@ -18,7 +21,11 @@ public abstract class Piece {
     }
 
 
-    public abstract boolean canMoveTo(Board board, int desCol, int desRow);
+    public abstract boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow);
+
+    public abstract boolean canMove(Board board, int desCol, int desRow);
+
+    public abstract List<Move> calculatePossibleMoves(Board board);
 
     protected boolean outOfPalace(int col, int row) {
         if (this.side == Side.RED) {
