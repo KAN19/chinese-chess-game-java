@@ -8,16 +8,20 @@ import java.util.Set;
 
 public class Board {
 
-
     private final Set<Piece> pieces = new HashSet<>();
+
+    private final Piece redGeneral;
+    private final Piece blackGeneral;
 
     public Set<Piece> getPieces() {
         return pieces;
     }
 
     public Board() {
-        pieces.add(new General(4, 0, Side.RED, "red-general"));
-        pieces.add(new General(4, 9, Side.BLACK, "black-general"));
+        redGeneral = new General(4, 0, Side.RED, "red-general");
+        blackGeneral = new General(4, 9, Side.BLACK, "black-general");
+        pieces.add(redGeneral);
+        pieces.add(blackGeneral);
 
         for (int i = 0; i < 2; i++) {
             pieces.add(new Chariot( i * 8, 0, Side.RED, "red-chariot"));
@@ -57,6 +61,15 @@ public class Board {
             return;
         }
         this.pieces.remove(targetP);
+    }
+
+    public Piece getGeneral(Side side) {
+        if (side == Side.RED) {
+            return redGeneral;
+        } else {
+            return blackGeneral;
+        }
+
     }
 
     @Override

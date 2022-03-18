@@ -6,3 +6,4 @@ public enum Side {
     RED,
     BLACK,
 }
+
