@@ -4,6 +4,7 @@ import gamelogic.board.Board;
 import gamelogic.board.Side;
 import gamelogic.player.Move;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bishop extends Piece{
@@ -13,8 +14,8 @@ public class Bishop extends Piece{
     }
 
     @Override
-    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
-        if (!isAlliance(desCol, desRow, board)) {
+    public boolean canMoveWithoutSuicide(Board board, int desCol, int desRow) {
+        if (!isAlliance(desCol, desRow, board) && !isOutOfBoard(desCol, desRow)) {
             return selfSide(desRow)
                     && board.pieceAt((this.getCol() + desCol)/2, (this.getRow() + desRow)/2) == null
                     && isDiagonal(desCol, desRow)
@@ -37,7 +38,9 @@ public class Bishop extends Piece{
     }
 
     @Override
-    public List<Move> calculatePossibleMoves(Board board) {
-        return null;
+    public void calculatePossibleMoves(Board board) {
+        int[][] possibleMovesParameters = {{2, 2}, {2,-2}, {-2,2}, {-2, -2}};
+        List<Move> moves = calculateMovesFromBasicMoves(board, possibleMovesParameters);
+        this.setPossibleMoves(moves);
     }
 }

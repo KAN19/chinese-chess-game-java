@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class General extends Piece {
+public class General extends Piece  {
 
     public General(int col, int row, Side side, String imgName) {
         super(col, row, side, imgName);
     }
 
     @Override
-    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
+    public boolean canMoveWithoutSuicide(Board board, int desCol, int desRow) {
         if (!isAlliance(desCol, desRow, board)) {
             if(!outOfPalace(desCol, desRow)
                     && steps(desCol, desRow) == 1
@@ -36,6 +36,12 @@ public class General extends Piece {
         return false;
     }
 
+    public boolean isGeneralExposed(Board board) {
+            General enemyGeneral = (General)board.getEnemyGeneral(this.side);
+        return isStraight(enemyGeneral.getCol(), enemyGeneral.getRow())
+                && numPiecesBetween(enemyGeneral.getCol(), enemyGeneral.getRow(), board) == 0;
+    }
+
     public boolean isAnyEnemyCanMoveTo(Board board, int desCol, int desRow) {
         Set<Piece> pieces = board.getPieces();
         for (Piece piece: pieces) {
@@ -48,26 +54,11 @@ public class General extends Piece {
         return false;
     }
 
+
     @Override
-    public List<Move> calculatePossibleMoves(Board board) {
-        List<Move> moves = new ArrayList<>();
-        if (this.side == Side.RED) {
-            for (int row = 0; row <= 2; row++) {
-                for (int col = 3; col <= 5; col++) {
-                    if (this.canMoveWithCheckGeneral(board, col, row)) {
-                        moves.add(new Move(Side.RED, this.col, this.row, col, row));
-                    }
-                }
-            }
-        } else {
-            for (int row = 7; row <= 9; row++) {
-                for (int col = 3; col <= 5; col++) {
-                    if  (this.canMoveWithCheckGeneral(board, col, row)) {
-                        moves.add(new Move(Side.RED, this.col, this.row, col, row));
-                    }
-                }
-            }
-        }
-        return moves;
+    public void calculatePossibleMoves(Board board) {
+        int[][] possibleMovesParameters = {{0, 1}, {-1, 0}, {1, 0}, {0, -1}};
+        List<Move> moves = calculateMovesFromBasicMoves(board, possibleMovesParameters);
+        this.setPossibleMoves(moves);
     }
 }

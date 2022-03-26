@@ -4,6 +4,7 @@ import gamelogic.board.Board;
 import gamelogic.board.Side;
 import gamelogic.player.Move;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Piece {
@@ -12,6 +13,7 @@ public abstract class Piece {
     protected String imgName;
     protected int col;
     protected int row;
+    protected List<Move> possibleMoves;
 
     public Piece(int col, int row, Side side, String imgName) {
         this.side = side;
@@ -21,11 +23,28 @@ public abstract class Piece {
     }
 
 
-    public abstract boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow);
+    public abstract boolean canMoveWithoutSuicide(Board board, int desCol, int desRow);
 
     public abstract boolean canMove(Board board, int desCol, int desRow);
 
-    public abstract List<Move> calculatePossibleMoves(Board board);
+    public abstract void calculatePossibleMoves(Board board);
+
+    public List<Move> calculateMovesFromBasicMoves(Board board, int[][] basicMoves) {
+        List<Move> moves = new ArrayList<>();
+
+        int currentCol = this.getCol();
+        int currentRow = this.getRow();
+
+        for (int[] possibleMovesParameter : basicMoves) {
+            int newPositionCol = currentCol + possibleMovesParameter[0];
+            int newPositionRow = currentRow + possibleMovesParameter[1];
+
+            if (this.canMoveWithoutSuicide(board, newPositionCol, newPositionRow)) {
+                moves.add(new Move(Side.RED, this.col, this.row, newPositionCol, newPositionRow));
+            }
+        }
+        return moves;
+    }
 
     protected boolean outOfPalace(int col, int row) {
         if (this.side == Side.RED) {
@@ -47,8 +66,20 @@ public abstract class Piece {
         return this.getCol() == toCol || this.getRow() == toRow;
     }
 
-    protected boolean isStraightForward(int desCol) {
-        return this.getCol() == desCol;
+    protected boolean isStraightForward(int desCol, int desRow) {
+        if (this.getSide() == Side.RED) {
+            return this.getCol() == desCol && this.getRow() < desRow;
+        } else {
+            return this.getCol() == desCol && this.getRow() > desRow;
+        }
+    }
+
+    protected boolean unableToMoveBackward(int desRow) {
+        if (this.getSide() == Side.RED) {
+            return this.getRow() <= desRow;
+        } else {
+            return this.getRow() >= desRow;
+        }
     }
 
 
@@ -90,6 +121,10 @@ public abstract class Piece {
         return target != null && target.side == this.side;
     }
 
+    protected boolean isOutOfBoard(int desCol, int desRow) {
+        return desCol < 0 || desCol > 8 || desRow < 0 || desRow > 9;
+    }
+
 
     public Side getSide() {
         return side;
@@ -121,5 +156,13 @@ public abstract class Piece {
 
     public void setRow(int row) {
         this.row = row;
+    }
+
+    public List<Move> getPossibleMoves() {
+        return possibleMoves;
+    }
+
+    public void setPossibleMoves(List<Move> possibleMoves) {
+        this.possibleMoves = possibleMoves;
     }
 }

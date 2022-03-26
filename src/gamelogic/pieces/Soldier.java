@@ -13,14 +13,15 @@ public class Soldier extends Piece {
     }
 
     @Override
-    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
+    public boolean canMoveWithoutSuicide(Board board, int desCol, int desRow) {
         if (!isAlliance(desCol, desRow, board)) {
             if (selfSide(this.getRow())) {
                 return steps(desCol, desRow) == 1
-                        && isStraightForward(desCol)
+                        && isStraightForward(desCol, desRow)
                         && board.canMoveWithoutBeingChecked(this.col, this.row, desCol, desRow);
             } else {
                 return steps(desCol, desRow) == 1
+                        && unableToMoveBackward(desRow)
                         && board.canMoveWithoutBeingChecked(this.col, this.row, desCol, desRow);
             }
         }
@@ -29,19 +30,21 @@ public class Soldier extends Piece {
 
     @Override
     public boolean canMove(Board board, int desCol, int desRow) {
-        if (!isAlliance(desCol, desRow, board)) {
+        if (!isAlliance(desCol, desRow, board) && !isOutOfBoard(desCol, desRow)) {
             if (selfSide(this.getRow())) {
                 return steps(desCol, desRow) == 1
-                        && isStraightForward(desCol);
+                        && isStraightForward(desCol, desRow);
             } else {
-                return steps(desCol, desRow) == 1;
+                return steps(desCol, desRow) == 1 && unableToMoveBackward(desRow);
             }
         }
         return false;
     }
 
     @Override
-    public List<Move> calculatePossibleMoves(Board board) {
-        return null;
+    public void calculatePossibleMoves(Board board) {
+        int[][] possibleMovesParameters = {{0, 1}, {-1, 0}, {1, 0}, {0, -1}};
+        List<Move> moves = calculateMovesFromBasicMoves(board, possibleMovesParameters);
+        this.setPossibleMoves(moves);
     }
 }

@@ -4,6 +4,7 @@ import gamelogic.board.Board;
 import gamelogic.board.Side;
 import gamelogic.player.Move;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Guard extends Piece{
@@ -13,7 +14,7 @@ public class Guard extends Piece{
     }
 
     @Override
-    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
+    public boolean canMoveWithoutSuicide(Board board, int desCol, int desRow) {
         if (!isAlliance(desCol, desRow, board)) {
             return !outOfPalace(desCol,desRow)
                     && isDiagonal(desCol, desRow)
@@ -36,7 +37,9 @@ public class Guard extends Piece{
     }
 
     @Override
-    public List<Move> calculatePossibleMoves(Board board) {
-        return null;
+    public void calculatePossibleMoves(Board board) {
+        int[][] possibleMovesParameters = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        List<Move> moves = calculateMovesFromBasicMoves(board, possibleMovesParameters);
+        this.setPossibleMoves(moves);
     }
 }

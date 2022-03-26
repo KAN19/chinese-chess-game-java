@@ -2,13 +2,14 @@ package gamelogic;
 
 import gamelogic.board.Board;
 import gamelogic.board.Side;
-import gamelogic.pieces.General;
-import gamelogic.pieces.Piece;
+import gamelogic.pieces.*;
 import gamelogic.player.Move;
 import gamelogic.player.Player;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class Game {
 
@@ -32,48 +33,9 @@ public class Game {
     public void movePiece(int orgCol, int orgRow, int desCol, int desRow) {
 
         if (board.onMovingPiece(turn ,orgCol, orgRow, desCol, desRow)) {
+            updatePossibleMoves();
             shiftTurn();
-        }
-
-//        if (doTheMoveAction(movingP, desCol, desRow)) {
-//
-//            checkGameStatus();
-//            //Co van de xiu
-//            if (isSuicide()) {
-//                revertLastMove(movingP, targetP, orgCol, orgRow);
-//            } else {
-//                changeTheTurn();
-//            }
-//            updatePossibleMoves();
-//        }
-    }
-
-    private boolean isSuicide() {
-        return turn == Side.RED && gameStatus == GameStatus.RED_BEING_CHECKED
-                || turn == Side.BLACK && gameStatus == GameStatus.BLACK_BEING_CHECKED;
-    }
-
-    private boolean doTheMoveAction(Piece movingP, int desCol, int desRow) {
-        Piece targetP = board.pieceAt(desCol, desRow);
-
-        if (movingP.canMoveWithCheckGeneral(board, desCol, desRow)) {
-            if (targetP != null) {
-                board.removePieceAt(targetP);
-            }
-            movingP.setCol(desCol);
-            movingP.setRow(desRow);
-
-            return true;
-
-        }
-        return false;
-    }
-
-    private void revertLastMove(Piece movedPiece, Piece targetP, int orgCol, int orgRow) {
-        movedPiece.setCol(orgCol);
-        movedPiece.setRow(orgRow);
-        if (targetP != null) {
-            board.getPieces().add(targetP);
+            checkGameStatus();
         }
     }
 
@@ -85,8 +47,16 @@ public class Game {
         if (isBeingCheck()) {
             System.out.println(turn + " dang bi checked");
             gameStatus = turn == Side.RED ? GameStatus.RED_BEING_CHECKED : GameStatus.BLACK_BEING_CHECKED;
-        } else {
-            gameStatus = GameStatus.PLAYING;
+        }
+
+        if (redPossibleMoves.size() == 0) {
+            System.out.println(Side.RED + " win");
+            gameStatus = GameStatus.BLACK_WIN;
+        }
+
+        if (blackPossibleMoves.size() == 0) {
+            System.out.println(Side.BLACK + " win");
+            gameStatus = GameStatus.RED_WIN;
         }
     }
 
@@ -104,18 +74,22 @@ public class Game {
         redPossibleMoves.clear();
         blackPossibleMoves.clear();
 
-        for (Piece piece : board.getPieces()) {
-            List<Move> piecePossibleMoves = piece.calculatePossibleMoves(board);
-            if (piecePossibleMoves != null) {
-                if (piece.getSide() == Side.RED) {
-                    redPossibleMoves.addAll(piecePossibleMoves);
-                } else {
-                    blackPossibleMoves.addAll(piecePossibleMoves);
+            Set<Piece> pieces = board.getPieces();
+
+        for (Piece piece : pieces) {
+//            if (piece instanceof Soldier) {
+                List<Move> piecePossibleMoves = piece.getPossibleMoves();
+                if (piecePossibleMoves != null) {
+                    if (piece.getSide() == Side.RED) {
+                        redPossibleMoves.addAll(piecePossibleMoves);
+                    } else {
+                        blackPossibleMoves.addAll(piecePossibleMoves);
+                    }
                 }
-            }
+//            }
         }
-        System.out.println("Red" + redPossibleMoves);
-        System.out.println("Black" + blackPossibleMoves);
+        System.out.println("Red" + redPossibleMoves.size());
+        System.out.println("Black" + blackPossibleMoves.size());
     }
 
     public Board getBoard() {

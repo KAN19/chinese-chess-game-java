@@ -4,6 +4,7 @@ import constant.GameConstant;
 import gamelogic.pieces.*;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class Board {
@@ -62,13 +63,14 @@ public class Board {
 
         if (movingP == null || currentTurn != movingP.getSide()) return false;
 
-        if (movingP.canMoveWithCheckGeneral(this, desCol, desRow)) {
+        if (movingP.canMoveWithoutSuicide(this, desCol, desRow)) {
             if (targetP != null) {
                 pieces.remove(targetP);
             }
             movingP.setCol(desCol);
             movingP.setRow(desRow);
 
+            updatePossibleMovesOfPieces();
             return true;
         }
 
@@ -76,6 +78,7 @@ public class Board {
     }
 
     public boolean canMoveWithoutBeingChecked(int orgCol, int orgRow, int desCol, int desRow) {
+//        Move the piece. If after moving, the general is not checked than return true
         boolean result = false;
 
         Piece movingP = this.pieceAt(orgCol, orgRow);
@@ -91,7 +94,8 @@ public class Board {
         if (!currentTurnGeneral
                 .isAnyEnemyCanMoveTo(this,
                         currentTurnGeneral.getCol(),
-                        currentTurnGeneral.getRow())) {
+                        currentTurnGeneral.getRow())
+                && !currentTurnGeneral.isGeneralExposed(this)) {
            result = true;
         }
 
@@ -108,11 +112,25 @@ public class Board {
         }
     }
 
-    public void removePieceAt(Piece targetP) {
-        if (targetP == null) {
-            return;
+    private boolean isAnyEnemyCanMoveToGeneral(Board board, int desCol, int desRow) {
+//        Set<Piece> pieces = board.getPieces();
+//        for (Piece piece: pieces) {
+////            Kiem tra co phai enemy khong
+//            if (piece.getSide() != this.getSide()
+//                    && piece.canMove(board, desCol, desRow)) {
+//                return true;
+//            }
+//        }
+        return false;
+    }
+
+    public void updatePossibleMovesOfPieces() {
+        Piece[] arrayPieces = new Piece[pieces.size()];
+        pieces.toArray(arrayPieces);
+
+        for (Piece arrayPiece : arrayPieces) {
+            arrayPiece.calculatePossibleMoves(this);
         }
-        this.pieces.remove(targetP);
     }
 
     public Piece getGeneral(Side side) {
@@ -121,7 +139,14 @@ public class Board {
         } else {
             return blackGeneral;
         }
+    }
 
+    public Piece getEnemyGeneral(Side currentSide) {
+        if (currentSide == Side.RED) {
+            return blackGeneral;
+        } else {
+            return redGeneral;
+        }
     }
 
     @Override

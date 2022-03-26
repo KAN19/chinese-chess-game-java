@@ -13,8 +13,8 @@ public class Knight extends Piece {
     }
 
     @Override
-    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
-        if (!isAlliance(desCol, desRow, board)) {
+    public boolean canMoveWithoutSuicide(Board board, int desCol, int desRow) {
+        if (!isAlliance(desCol, desRow, board) && !isOutOfBoard(desCol, desRow)) {
             if (Math.abs(this.col - desCol) == 1 && Math.abs(this.row - desRow) == 2) {
                 return (board.pieceAt(this.col, (this.row + desRow) / 2) == null)
                         && board.canMoveWithoutBeingChecked(this.col, this.row, desCol, desRow);
@@ -41,8 +41,12 @@ public class Knight extends Piece {
     }
 
     @Override
-    public List<Move> calculatePossibleMoves(Board board) {
-        return null;
+    public void calculatePossibleMoves(Board board) {
+        int[][] possibleMovesParameters = {
+                {-2, -1}, {-1, -2}, {1, -2}, {2, -1},
+                {2, 1}, {1, 2}, {-1, 2}, {-2, 1}};
+        List<Move> moves = calculateMovesFromBasicMoves(board, possibleMovesParameters);
+        this.setPossibleMoves(moves);
     }
 
 

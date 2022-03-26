@@ -1,19 +1,21 @@
 package gamelogic.pieces;
 
+import constant.GameConstant;
 import gamelogic.board.Board;
 import gamelogic.board.Side;
 import gamelogic.player.Move;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Chariot extends Piece{
+public class Chariot extends Piece {
 
     public Chariot(int col, int row, Side side, String imgName) {
         super(col, row, side, imgName);
     }
 
     @Override
-    public boolean canMoveWithCheckGeneral(Board board, int desCol, int desRow) {
+    public boolean canMoveWithoutSuicide(Board board, int desCol, int desRow) {
         if (!isAlliance(desCol, desRow, board)) {
             return isStraight(desCol, desRow)
                     && numPiecesBetween(desCol, desRow, board) == 0
@@ -32,7 +34,24 @@ public class Chariot extends Piece{
     }
 
     @Override
-    public List<Move> calculatePossibleMoves(Board board) {
-        return null;
+    public void calculatePossibleMoves(Board board) {
+        List<Move> moves = new ArrayList<>();
+
+        int currentCol = this.getCol();
+        int currentRow = this.getRow();
+
+        for (int row = 0; row < GameConstant.BOARD_ROWS; row++) {
+            if (this.canMoveWithoutSuicide(board, currentCol, row)) {
+                moves.add(new Move(Side.RED, this.col, this.row, currentCol, row));
+            }
+        }
+        for (int col = 0; col < GameConstant.BOARD_COLS; col++) {
+            if (this.canMoveWithoutSuicide(board, col, currentRow)) {
+                moves.add(new Move(Side.RED, this.col, this.row, col, currentRow));
+            }
+        }
+
+        this.setPossibleMoves(moves);
+
     }
 }
