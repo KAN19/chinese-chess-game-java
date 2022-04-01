@@ -6,10 +6,10 @@ import gamelogic.pieces.*;
 import gamelogic.player.Move;
 import gamelogic.player.Player;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 public class Game {
 
@@ -23,12 +23,16 @@ public class Game {
 
     public Game() {
         this.board = new Board();
-        this.player1 = new Player(this.board, Side.RED);
-        this.player2 = new Player(this.board, Side.BLACK);
+        this.player1 = new Player(Side.RED, 1, 5);
+        this.player2 = new Player(Side.BLACK, 1, 5);
         gameStatus = GameStatus.PLAYING;
         redPossibleMoves = new ArrayList<>();
         blackPossibleMoves = new ArrayList<>();
+
+        this.player1.startTimer();
+
     }
+
 
     public void movePiece(int orgCol, int orgRow, int desCol, int desRow) {
 
@@ -40,24 +44,37 @@ public class Game {
     }
 
     private void shiftTurn() {
-        this.turn = this.turn == Side.RED ? Side.BLACK : Side.RED;
+        if (this.turn == Side.RED) {
+            player1.stopTimer();
+            this.turn = Side.BLACK;
+            player2.startTimer();
+        } else {
+            player2.stopTimer();
+            this.turn = Side.RED;
+            player1.startTimer();
+        }
+//        this.turn = this.turn == Side.RED ? Side.BLACK : Side.RED;
     }
 
     public void checkGameStatus() {
-        if (isBeingCheck()) {
-            System.out.println(turn + " dang bi checked");
-            gameStatus = turn == Side.RED ? GameStatus.RED_BEING_CHECKED : GameStatus.BLACK_BEING_CHECKED;
-        }
 
         if (redPossibleMoves.size() == 0) {
             System.out.println(Side.RED + " win");
             gameStatus = GameStatus.BLACK_WIN;
+            return;
         }
 
         if (blackPossibleMoves.size() == 0) {
             System.out.println(Side.BLACK + " win");
             gameStatus = GameStatus.RED_WIN;
+            return;
         }
+
+        if (isBeingCheck()) {
+            System.out.println(turn + " dang bi checked");
+            gameStatus = turn == Side.RED ? GameStatus.RED_BEING_CHECKED : GameStatus.BLACK_BEING_CHECKED;
+        }
+
     }
 
 

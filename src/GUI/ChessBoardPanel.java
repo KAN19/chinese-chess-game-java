@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class ChessBoardPanel extends JPanel implements MouseListener {
-    static final int orgX = 60, orgY = 60, side = 67;
+    static final int orgX = 40, orgY = 40, side = 67;
 
     final Map<String, Image> pieceImages = new HashMap<>();
     private final Game game;
@@ -22,9 +22,8 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
     public ChessBoardPanel(Game game) {
         this.game = game;
         addMouseListener(this);
-//        this.setBackground(Color.BLUE);
-//        this.setBounds(new Rectangle(30, 30, 650, 67* 11));
-//        this.setLayout(null);
+        this.setBackground(Color.BLUE);
+        this.setBounds(new Rectangle(20, 20, 67 * 9 + 20, 67* 10 + 20));
 
         try {
             Set<String> imageNames = new HashSet<>(Arrays.asList(
