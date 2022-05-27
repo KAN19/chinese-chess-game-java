@@ -1,5 +1,6 @@
 package gamelogic.player;
 
+import constant.GameTypeEnum;
 import gamelogic.board.Side;
 
 import javax.swing.*;
@@ -17,6 +18,8 @@ public class Player {
     private String lastDuration ;
     private String currentDuration ;
 
+    private String name;
+
     private boolean isComputer;
 
 
@@ -26,10 +29,12 @@ public class Player {
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
 
-    public Player(Side side, int minute, int second) {
+    public Player(String name, Side side, int minute, int second, boolean isComputer) {
+        this.name = name;
         this.side = side;
         this.minute = minute;
         this.second = second;
+        this.isComputer = isComputer;
 
         ddSecond = dformat.format(second);
         ddMinute = dformat.format(minute);
@@ -74,6 +79,10 @@ public class Player {
         support.removePropertyChangeListener(l);
     }
 
+    public String getName() {
+        return name;
+    }
+
     public boolean isComputer() {
         return isComputer;
     }
@@ -106,9 +115,9 @@ public class Player {
         return side;
     }
 
-    public void setSide(Side side) {
-        this.side = side;
-    }
+//    public void setSide(Side side) {
+//        this.side = side;
+//    }
 
     public List<Move> getMoveList() {
         return moveList;

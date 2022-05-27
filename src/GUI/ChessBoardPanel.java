@@ -115,7 +115,7 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
     }
 
     private void drawSelectedPiece(Graphics g) {
-        if (selectingPiece != null && selectingPiece.getSide() == game.getCurrentPlayerTurn().getSide()) {
+        if (selectingPiece != null && !game.getCurrentPlayerTurn().isComputer()) {
             g.drawRect(orgX + selectingPiece.getCol() * side - side / 2,
                     orgY +  selectingPiece.getRow() * side - side / 2,
                     67,
@@ -159,17 +159,21 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Point clickedCoordinate = xyToColRow(e.getPoint());
-        if (selectingPiece == null) {
-            selectingPiece = game.getBoard().pieceAt(clickedCoordinate.x, clickedCoordinate.y);
-        } else {
-            game.movePiece(selectingPiece.getCol(),
-                            selectingPiece.getRow(),
-                            clickedCoordinate.x,
-                            clickedCoordinate.y);
-            selectingPiece = null;
+        System.out.println(game.getCurrentPlayerTurn().isComputer());
+        if (!game.getCurrentPlayerTurn().isComputer()) {
+            Point clickedCoordinate = xyToColRow(e.getPoint());
+            if (selectingPiece == null) {
+                selectingPiece = game.getBoard().pieceAt(clickedCoordinate.x, clickedCoordinate.y);
+            } else {
+                game.movePiece(selectingPiece.getCol(),
+                        selectingPiece.getRow(),
+                        clickedCoordinate.x,
+                        clickedCoordinate.y);
+                selectingPiece = null;
+            }
+            repaint();
         }
-        repaint();
+
     }
 
     private int generateRandomNumber(int rangeValue) {
@@ -183,15 +187,21 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-//        System.out.println("change ne");
-//        List<Move> computerMoves = (List<Move>) evt.getNewValue();
-//        int randomNumber = generateRandomNumber(computerMoves.size());
+        System.out.println("change ne");
+        List<Move> computerMoves = (List<Move>) evt.getNewValue();
+        int numberOfMoves = computerMoves.size();
+        if (numberOfMoves >0) {
+            int randomNumber = generateRandomNumber(numberOfMoves);
 //            try {
-//                Thread.sleep(5000);
+//                Thread.sleep(2000);
 //            } catch (InterruptedException e) {
 //                throw new RuntimeException(e);
 //            }
-//        System.out.println(randomNumber);
+            Move randomMove = computerMoves.get(randomNumber);
+            game.movePiece(randomMove.getOrgCol(), randomMove.getOrgRow(), randomMove.getDesCol(), randomMove.getDesRow());
+            System.out.println(computerMoves.get(randomNumber));
+        }
+
     }
 
     @Override

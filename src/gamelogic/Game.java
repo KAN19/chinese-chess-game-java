@@ -29,8 +29,8 @@ public class Game {
 
     public Game() {
         this.board = new Board();
-        this.player1 = new Player(Side.RED, 1, 5);
-        this.player2 = new Player(Side.BLACK, 1, 5);
+        this.player1 = new Player("player1", Side.RED, 1, 5, false );
+        this.player2 = new Player("player2", Side.BLACK, 1, 5, true);
         this.currentPlayerTurn = player1;
         gameStatus = GameStatus.PLAYING;
         this.player1.startTimer();
@@ -41,8 +41,8 @@ public class Game {
     public Game(GameTypeEnum gameType) {
         this.gameType = gameType;
 
-        this.player1 = new Player(Side.RED, 1, 5);
-        this.player2 = new Player(Side.BLACK, 1, 5);
+        this.player1 = new Player("player1", Side.RED, 1, 5, false);
+        this.player2 = new Player("player2", Side.BLACK, 1, 5, true);
 
         this.board = new Board();
 
@@ -68,16 +68,18 @@ public class Game {
     }
 
     private void shiftTurn() {
-        if (this.currentPlayerTurn.getSide() == Side.RED) {
+        if (Objects.equals(this.currentPlayerTurn.getName(), "player1")) {
 
             player1.stopTimer();
-            this.currentPlayerTurn.setSide(Side.BLACK);
+            this.currentPlayerTurn = player2;
             player2.startTimer();
-        } else {
+
+            //            danh cho black la computer only
             support.firePropertyChange("MoveChanged", "old ne", blackPossibleMoves);
+        } else {
 
             player2.stopTimer();
-            this.currentPlayerTurn.setSide(Side.RED);
+            this.currentPlayerTurn = player1;
             player1.startTimer();
         }
 //        this.turn = this.turn == Side.RED ? Side.BLACK : Side.RED;
@@ -86,19 +88,19 @@ public class Game {
     public void checkGameStatus() {
 
         if (redPossibleMoves.size() == 0) {
-            System.out.println(Side.RED + " win");
+            System.out.println(Side.BLACK + " win");
             gameStatus = GameStatus.BLACK_WIN;
             return;
         }
 
         if (blackPossibleMoves.size() == 0) {
-            System.out.println(Side.BLACK + " win");
+            System.out.println(Side.RED + " win");
             gameStatus = GameStatus.RED_WIN;
             return;
         }
 
         if (isBeingCheck()) {
-            System.out.println(currentPlayerTurn + " dang bi checked");
+            System.out.println(currentPlayerTurn.getSide() + " dang bi checked");
             gameStatus = currentPlayerTurn.getSide() == Side.RED ? GameStatus.RED_BEING_CHECKED : GameStatus.BLACK_BEING_CHECKED;
         }
 
@@ -140,6 +142,9 @@ public class Game {
         support.addPropertyChangeListener(l);
     }
 
+    public GameTypeEnum getGameType() {
+        return gameType;
+    }
 
     public Board getBoard() {
         return board;

@@ -16,7 +16,10 @@ public class GameGUI {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setResizable(false);
 
+//        Cai nay cho 2 nguoi choi
 //        Game game = new Game();
+
+//        Cai nay cho choi voi may
         Game game = new Game(GameTypeEnum.BLACK_IS_COMPUTER);
 
         ChessBoardPanel cchessPanel = new ChessBoardPanel(game);
