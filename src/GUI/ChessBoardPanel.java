@@ -3,17 +3,21 @@ package GUI;
 import constant.GameConstant;
 import gamelogic.Game;
 import gamelogic.pieces.Piece;
+import gamelogic.player.Move;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
-public class ChessBoardPanel extends JPanel implements MouseListener {
-    static final int orgX = 40, orgY = 40, side = 67;
+public class ChessBoardPanel extends JPanel implements MouseListener, PropertyChangeListener {
+    static final int orgX = 40, orgY = 40, side = 60;
 
     final Map<String, Image> pieceImages = new HashMap<>();
     private final Game game;
@@ -21,9 +25,10 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
 
     public ChessBoardPanel(Game game) {
         this.game = game;
+        game.addPropertyChangeListener(this);
         addMouseListener(this);
         this.setBackground(Color.BLUE);
-        this.setBounds(new Rectangle(20, 20, 67 * 9 + 20, 67* 10 + 20));
+        this.setBounds(new Rectangle(20, 20, side * 9 + 20, side* 10 + 20));
 
         try {
             Set<String> imageNames = new HashSet<>(Arrays.asList(
@@ -110,7 +115,7 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
     }
 
     private void drawSelectedPiece(Graphics g) {
-        if (selectingPiece != null && selectingPiece.getSide() == game.getTurn()) {
+        if (selectingPiece != null && selectingPiece.getSide() == game.getCurrentPlayerTurn().getSide()) {
             g.drawRect(orgX + selectingPiece.getCol() * side - side / 2,
                     orgY +  selectingPiece.getRow() * side - side / 2,
                     67,
@@ -154,7 +159,6 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-//        System.out.println(xyToColRow(e.getPoint()));
         Point clickedCoordinate = xyToColRow(e.getPoint());
         if (selectingPiece == null) {
             selectingPiece = game.getBoard().pieceAt(clickedCoordinate.x, clickedCoordinate.y);
@@ -166,7 +170,28 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
             selectingPiece = null;
         }
         repaint();
-//        if (selectedPiece)
+    }
+
+    private int generateRandomNumber(int rangeValue) {
+        Random generator = new Random();
+        return generator.nextInt(rangeValue);
+    }
+
+    private void computerMovePiece() {
+
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+//        System.out.println("change ne");
+//        List<Move> computerMoves = (List<Move>) evt.getNewValue();
+//        int randomNumber = generateRandomNumber(computerMoves.size());
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+//        System.out.println(randomNumber);
     }
 
     @Override
@@ -188,4 +213,6 @@ public class ChessBoardPanel extends JPanel implements MouseListener {
     public void mouseExited(MouseEvent e) {
 
     }
+
+
 }

@@ -3,6 +3,8 @@ package gamelogic.player;
 import gamelogic.board.Side;
 
 import javax.swing.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -12,16 +14,27 @@ public class Player {
     private List<Move> moveList;
     private Timer timer;
     private int second, minute;
+    private String lastDuration ;
+    private String currentDuration ;
+
+    private boolean isComputer;
 
 
     private String ddSecond, ddMinute;
     private final DecimalFormat dformat = new DecimalFormat("00");
+
+    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+
 
     public Player(Side side, int minute, int second) {
         this.side = side;
         this.minute = minute;
         this.second = second;
 
+        ddSecond = dformat.format(second);
+        ddMinute = dformat.format(minute);
+
+        currentDuration = ddMinute + ":" + ddSecond;
         initTimer();
     }
 
@@ -30,7 +43,12 @@ public class Player {
 
             ddSecond = dformat.format(second);
             ddMinute = dformat.format(minute);
-            System.out.println(side + " Time left: " + ddMinute + ":" + ddSecond);
+//            System.out.println(side + " Time left: " + ddMinute + ":" + ddSecond);
+
+            lastDuration = currentDuration;
+            currentDuration = ddMinute + ":" + ddSecond;
+
+            setResult(currentDuration);
             second--;
 
 
@@ -42,6 +60,30 @@ public class Player {
                 this.timer.stop();
             }
         });
+    }
+
+    public void setResult(String newValue) {
+        support.firePropertyChange("currentDuration", lastDuration, newValue);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+        support.addPropertyChangeListener(l);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+        support.removePropertyChangeListener(l);
+    }
+
+    public boolean isComputer() {
+        return isComputer;
+    }
+
+    public String getCurrentDuration() {
+        return currentDuration;
+    }
+
+    public PropertyChangeSupport getSupport() {
+        return support;
     }
 
     public String getDdSecond() {

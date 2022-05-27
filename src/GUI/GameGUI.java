@@ -1,5 +1,6 @@
 package GUI;
 
+import constant.GameTypeEnum;
 import gamelogic.Game;
 
 import javax.swing.*;
@@ -10,16 +11,20 @@ public class GameGUI {
     public GameGUI() {
         JFrame f = new JFrame("Chinese Chess");
         f.setSize(1000, 800);
-        f.setLocation(50, 50);
+        f.setLocation(0, 0);
         f.setLayout(null);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setResizable(false);
 
-        Game game = new Game();
+//        Game game = new Game();
+        Game game = new Game(GameTypeEnum.BLACK_IS_COMPUTER);
+
         ChessBoardPanel cchessPanel = new ChessBoardPanel(game);
         SideControlPanel sideControlPanel = new SideControlPanel(game);
 
         f.add(cchessPanel);
         f.add(sideControlPanel);
+
         f.setVisible(true);
     }
 
