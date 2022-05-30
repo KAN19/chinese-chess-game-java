@@ -30,7 +30,7 @@ public class Game {
     public Game() {
         this.board = new Board();
         this.player1 = new Player("player1", Side.RED, 1, 5, false );
-        this.player2 = new Player("player2", Side.BLACK, 1, 5, true);
+        this.player2 = new Player("player2", Side.BLACK, 1, 5, false);
         this.currentPlayerTurn = player1;
         gameStatus = GameStatus.PLAYING;
         this.player1.startTimer();

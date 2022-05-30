@@ -53,7 +53,7 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 //                                .getResource("/GUI/res/" + imageName + ".png"))));
                 Image pieceImage = ImageIO
                         .read(Objects.requireNonNull(this.getClass()
-                                .getResource("/GUI/res/" + imageName + ".png")));
+                                .getResource("/res/" + imageName + ".png")));
                 pieceImages.put(imageName, pieceImage);
             }
 
@@ -187,19 +187,21 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("change ne");
-        List<Move> computerMoves = (List<Move>) evt.getNewValue();
-        int numberOfMoves = computerMoves.size();
-        if (numberOfMoves >0) {
-            int randomNumber = generateRandomNumber(numberOfMoves);
+        if (game.getCurrentPlayerTurn().isComputer()) {
+            System.out.println(game.getCurrentPlayerTurn().isComputer());
+            List<Move> computerMoves = (List<Move>) evt.getNewValue();
+            int numberOfMoves = computerMoves.size();
+            if (numberOfMoves >0) {
+                int randomNumber = generateRandomNumber(numberOfMoves);
 //            try {
 //                Thread.sleep(2000);
 //            } catch (InterruptedException e) {
 //                throw new RuntimeException(e);
 //            }
-            Move randomMove = computerMoves.get(randomNumber);
-            game.movePiece(randomMove.getOrgCol(), randomMove.getOrgRow(), randomMove.getDesCol(), randomMove.getDesRow());
-            System.out.println(computerMoves.get(randomNumber));
+                Move randomMove = computerMoves.get(randomNumber);
+                game.movePiece(randomMove.getOrgCol(), randomMove.getOrgRow(), randomMove.getDesCol(), randomMove.getDesRow());
+                System.out.println(computerMoves.get(randomNumber));
+            }
         }
 
     }
