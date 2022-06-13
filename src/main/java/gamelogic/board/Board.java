@@ -56,7 +56,7 @@ public class Board {
         return null;
     }
 
-    public boolean onMovingPiece(Side currentTurn, int orgCol, int orgRow, int desCol, int desRow) {
+        public boolean onMovingPiece(Side currentTurn, int orgCol, int orgRow, int desCol, int desRow) {
 
         Piece movingP = this.pieceAt(orgCol, orgRow);
         Piece targetP = this.pieceAt(desCol, desRow);

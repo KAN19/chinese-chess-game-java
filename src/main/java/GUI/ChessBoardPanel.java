@@ -27,7 +27,7 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
         this.game = game;
         game.addPropertyChangeListener(this);
         addMouseListener(this);
-        this.setBackground(Color.BLUE);
+//        this.setBackground(Color.BLUE);
         this.setBounds(new Rectangle(20, 20, side * 9 + 20, side* 10 + 20));
 
         try {
@@ -181,9 +181,6 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
         return generator.nextInt(rangeValue);
     }
 
-    private void computerMovePiece() {
-
-    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

@@ -2,6 +2,7 @@ package gamelogic.player;
 
 import constant.GameTypeEnum;
 import gamelogic.board.Side;
+import onlineFeature.Client;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
@@ -17,6 +18,8 @@ public class Player {
     private int second, minute;
     private String lastDuration ;
     private String currentDuration ;
+
+    Client client;
 
     private String name;
 
@@ -115,7 +118,11 @@ public class Player {
         return side;
     }
 
-//    public void setSide(Side side) {
+    public void setComputer(boolean computer) {
+        isComputer = computer;
+    }
+
+    //    public void setSide(Side side) {
 //        this.side = side;
 //    }
 

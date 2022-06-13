@@ -27,8 +27,19 @@ public abstract class Piece {
 
     public abstract boolean canMove(Board board, int desCol, int desRow);
 
+    /**
+     * Calculate legal moves, including checking if moves can be executed by player.
+     * @param board instance of board game
+     */
     public abstract void calculatePossibleMoves(Board board);
 
+
+    /**
+     * Calculate all legal moves, including suiciding or out of board moves.
+     * @param board board game dependency
+     * @param basicMoves the basic legal moves of a piece at a specific coordination. For example [2,-2], [2,2] for the Bishop
+     * @return list of moves
+     */
     public List<Move> calculateMovesFromBasicMoves(Board board, int[][] basicMoves) {
         List<Move> moves = new ArrayList<>();
 

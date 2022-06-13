@@ -6,6 +6,8 @@ import gamelogic.board.Side;
 import gamelogic.pieces.*;
 import gamelogic.player.Move;
 import gamelogic.player.Player;
+import onlineFeature.Client;
+import onlineFeature.Server;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -22,39 +24,39 @@ public class Game {
     List<Move> blackPossibleMoves = new ArrayList<>();
 
     GameTypeEnum gameType;
-    String startFirst;
+
+    private Client client;
+    private Server server;
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-
-    public Game() {
-        this.board = new Board();
-        this.player1 = new Player("player1", Side.RED, 1, 5, false );
-        this.player2 = new Player("player2", Side.BLACK, 1, 5, false);
-        this.currentPlayerTurn = player1;
-        gameStatus = GameStatus.PLAYING;
-        this.player1.startTimer();
-
-    }
-
-//    Black is computer
     public Game(GameTypeEnum gameType) {
         this.gameType = gameType;
-
-        this.player1 = new Player("player1", Side.RED, 1, 5, false);
-        this.player2 = new Player("player2", Side.BLACK, 1, 5, true);
-
+        this.gameStatus = GameStatus.PLAYING;
         this.board = new Board();
 
-        if (gameType == GameTypeEnum.BLACK_IS_COMPUTER) {
-            this.currentPlayerTurn = player1;
-        } else if (gameType == GameTypeEnum.RED_IS_COMPUTER) {
-            this.currentPlayerTurn = player2;
+        this.player1 = new Player("player1", Side.RED, 1, 5, false );
+        this.player2 = new Player("player2", Side.BLACK, 1, 5, false);
+
+        switch (gameType) {
+            case BLACK_IS_COMPUTER:
+                this.player2.setComputer(true);
+                this.currentPlayerTurn = player1;
+                break;
+            case P2P_OFFLINE:
+                this.currentPlayerTurn = player1;
+                break;
+            case P2P_ONLINE_SERVER:
+                createServer();
+                createClient();
+                break;
+            case P2P_ONLINE_CLIENT:
+                createClient();
+                break;
         }
 
-        gameStatus = GameStatus.PLAYING;
 
-        this.player1.startTimer();
+//        this.player1.startTimer();
     }
 
 
@@ -141,6 +143,27 @@ public class Game {
     public void addPropertyChangeListener(PropertyChangeListener l) {
         support.addPropertyChangeListener(l);
     }
+
+    private Server createServer() {
+        if (this.server == null) {
+            this.server = new Server();
+        }
+        Thread thread = new Thread(server);
+        thread.start();
+
+        return this.server;
+    }
+
+    private Client createClient() {
+        if (this.client == null) {
+            this.client = new Client();
+        }
+        Thread thread = new Thread(client);
+        thread.start();
+
+        return this.client;
+    }
+
 
     public GameTypeEnum getGameType() {
         return gameType;
