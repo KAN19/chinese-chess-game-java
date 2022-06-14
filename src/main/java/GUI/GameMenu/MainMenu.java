@@ -1,31 +1,31 @@
 package GUI.GameMenu;
 
 import GUI.GameGUI;
-import GUI.PlayOnlineMenu.RoomPickerMenu;
+
+import GUI.GameMenu.EnterNameMenu.EnterNameMenu;
+import GUI.GameMenu.RoomPickerMenu.RoomPickerMenu;
+import GUI.GameMenu.decorator.BackgroundImangePanel;
 import constant.GameTypeEnum;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Objects;
 
 public class MainMenu extends JFrame{
     private JPanel mainPanel;
     private JLabel mainTitle;
     private JButton buttonPlayComputer;
     private JButton buttonPlayOnline;
-    private JTextField playerNameInput;
-    private JButton playButton;
     private JPanel enterNamePanel;
     private JPanel playOptionPanel;
-    private JLabel playerNameLabel;
     private JButton playP2POfflineButton;
+    private JButton seeRecord;
 
     public MainMenu()  {
 
         this.setSize(500, 500);
         this.setTitle("Nguyen Kiet Chiness Chess Game");
-        this.playOptionPanel.setVisible(true);
+
         this.setContentPane(mainPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -40,21 +40,19 @@ public class MainMenu extends JFrame{
         buttonPlayOnline.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                displayRoomPickerMenu();
+                displayEnterNameMenu();
                 disposeAction();
             }
         });
-        playButton.addActionListener(new ActionListener() {
+
+        playP2POfflineButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Objects.equals(playerNameInput.getText(), "")) {
-                    JOptionPane.showMessageDialog(mainPanel, "Please enter your name to play game!");
-                } else {
-                    updateGameMenu();
-                }
+                new GameGUI(GameTypeEnum.P2P_OFFLINE);
+                disposeAction();
             }
         });
-        playP2POfflineButton.addActionListener(new ActionListener() {
+        seeRecord.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -64,19 +62,17 @@ public class MainMenu extends JFrame{
 
     private void disposeAction() {
         this.dispose();
-
     }
 
 
-    private void updateGameMenu() {
-        this.playOptionPanel.setVisible(true);
-        this.enterNamePanel.setVisible(false);
-        this.playerNameLabel.setText("Hello champion, " + this.playerNameInput.getText());
+    private void displayEnterNameMenu() {
+
+        JFrame frame = new EnterNameMenu();
+        frame.setVisible(true);
     }
 
-    private void displayRoomPickerMenu() {
-        JFrame roomPicker = new RoomPickerMenu();
-        roomPicker.setVisible(true);
+    private void displayNameEntering() {
+
     }
 
 }

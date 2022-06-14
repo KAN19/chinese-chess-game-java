@@ -2,6 +2,7 @@ package GUI;
 
 import constant.GameConstant;
 import gamelogic.Game;
+import gamelogic.board.Side;
 import gamelogic.pieces.Piece;
 import gamelogic.player.Move;
 
@@ -13,8 +14,8 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class ChessBoardPanel extends JPanel implements MouseListener, PropertyChangeListener {
     static final int orgX = 40, orgY = 40, side = 60;
@@ -23,12 +24,15 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
     private final Game game;
     Piece selectingPiece;
 
-    public ChessBoardPanel(Game game) {
+    private JFrame jFrame;
+
+    public ChessBoardPanel(Game game, JFrame frame) {
         this.game = game;
+        this.jFrame = frame;
         game.addPropertyChangeListener(this);
         addMouseListener(this);
 //        this.setBackground(Color.BLUE);
-        this.setBounds(new Rectangle(20, 20, side * 9 + 20, side* 10 + 20));
+        this.setBounds(new Rectangle(20, 20, side * 9 + 20, side * 10 + 20));
 
         try {
             Set<String> imageNames = new HashSet<>(Arrays.asList(
@@ -117,7 +121,7 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
     private void drawSelectedPiece(Graphics g) {
         if (selectingPiece != null && !game.getCurrentPlayerTurn().isComputer()) {
             g.drawRect(orgX + selectingPiece.getCol() * side - side / 2,
-                    orgY +  selectingPiece.getRow() * side - side / 2,
+                    orgY + selectingPiece.getRow() * side - side / 2,
                     67,
                     67);
         }
@@ -159,21 +163,51 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println(game.getCurrentPlayerTurn().isComputer());
         if (!game.getCurrentPlayerTurn().isComputer()) {
             Point clickedCoordinate = xyToColRow(e.getPoint());
             if (selectingPiece == null) {
                 selectingPiece = game.getBoard().pieceAt(clickedCoordinate.x, clickedCoordinate.y);
             } else {
-                game.movePiece(selectingPiece.getCol(),
+
+                int orgCol = selectingPiece.getCol();
+                int orgRow = selectingPiece.getRow();
+
+                if (game.movePiece(
+                        selectingPiece.getCol(),
                         selectingPiece.getRow(),
                         clickedCoordinate.x,
-                        clickedCoordinate.y);
+                        clickedCoordinate.y)) {
+
+                    sendMoveToLan(
+                            new Move(game.getCurrentPlayerTurn().getSide(),
+                                    orgCol,
+                                    orgRow,
+                                    clickedCoordinate.x,
+                                    clickedCoordinate.y));
+
+                };
+
                 selectingPiece = null;
             }
-            repaint();
         }
 
+        repaint();
+
+        if (game.getGameStatus() == Game.GameStatus.BLACK_WIN) {
+            JOptionPane.showMessageDialog(jFrame, "Nguoi choi " + Side.BLACK + " chien thang!");
+        } else if (game.getGameStatus() == Game.GameStatus.RED_WIN){
+            JOptionPane.showMessageDialog(jFrame, "Nguoi choi " + Side.RED + " chien thang!");
+        }
+    }
+
+    private void sendMoveToLan(Move move) {
+        if (game.getServer() != null) {
+            game.getServer().sendPieceMove(move);
+        }
+
+        if (game.getClient() != null) {
+            game.getClient().sendPieceMove(move);
+        }
     }
 
     private int generateRandomNumber(int rangeValue) {
@@ -184,23 +218,19 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (game.getCurrentPlayerTurn().isComputer()) {
-            System.out.println(game.getCurrentPlayerTurn().isComputer());
-            List<Move> computerMoves = (List<Move>) evt.getNewValue();
-            int numberOfMoves = computerMoves.size();
-            if (numberOfMoves >0) {
-                int randomNumber = generateRandomNumber(numberOfMoves);
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                throw new RuntimeException(e);
-//            }
-                Move randomMove = computerMoves.get(randomNumber);
-                game.movePiece(randomMove.getOrgCol(), randomMove.getOrgRow(), randomMove.getDesCol(), randomMove.getDesRow());
-                System.out.println(computerMoves.get(randomNumber));
+        if (Objects.equals(evt.getPropertyName(), "possibleMovesForComputer")) {
+            if (game.getCurrentPlayerTurn().isComputer()) {
+//            System.out.println(game.getCurrentPlayerTurn().isComputer());
+                List<Move> computerMoves = (List<Move>) evt.getNewValue();
+                int numberOfMoves = computerMoves.size();
+                if (numberOfMoves > 0) {
+                    int randomNumber = generateRandomNumber(numberOfMoves);
+
+                    Move randomMove = computerMoves.get(randomNumber);
+                    game.movePiece(randomMove.getOrgCol(), randomMove.getOrgRow(), randomMove.getDesCol(), randomMove.getDesRow());
+                }
             }
         }
-
     }
 
     @Override

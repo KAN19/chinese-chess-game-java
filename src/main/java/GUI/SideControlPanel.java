@@ -3,18 +3,18 @@ package GUI;
 import gamelogic.Game;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Objects;
 
 public class SideControlPanel extends JPanel  implements MouseListener, PropertyChangeListener {
     private final Game game;
-    private String previousBlackTimeLeft = "";
-    private String previousRedTimeLeft = "";
 
-    JTextArea txt = new JTextArea();
+    JTextArea txt = new JTextArea(20, 20);
 
     public SideControlPanel(Game game) {
         addMouseListener(this);
@@ -22,17 +22,23 @@ public class SideControlPanel extends JPanel  implements MouseListener, Property
         this.setBounds(new Rectangle(67 * 9 + 40, 20, 350, 800));
         this.setLayout(null);
 
-        txt.setBounds(20, 120, 300, 300);
-        txt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        txt.setEditable(false);
 
-        txt.setText("Hello");
-        txt.append("\nNguyen kiet");
+        txt.setBounds(20, 120, 300, 100);
+        txt.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        txt.setLayout(new FlowLayout());
+
+
+        JScrollPane jScrollPane = new JScrollPane(txt,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        this.add(jScrollPane);
         this.add(txt);
 
         game.getPlayer1().addPropertyChangeListener(this);
         game.getPlayer2().addPropertyChangeListener(this);
 
+        game.addPropertyChangeListener(this);
     }
 
     @Override
@@ -72,8 +78,20 @@ public class SideControlPanel extends JPanel  implements MouseListener, Property
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        repaint();
-//        System.out.println("Catch change " + evt.getNewValue());
+        if (Objects.equals(evt.getPropertyName(), "currentDurationChanged")) {
+            repaint();
+        }
+        if (Objects.equals(evt.getPropertyName(), "listMoveInTextFieldChanged")) {
+            txt.setText((String)evt.getNewValue());
+        }
+
+        if (Objects.equals(evt.getPropertyName(), "isBeingChecked")) {
+            if (game.getGameStatus() == Game.GameStatus.BLACK_BEING_CHECKED) {
+                txt.append("Black đang bị chiếu tướng!");
+            } else if (game.getGameStatus() == Game.GameStatus.RED_BEING_CHECKED) {
+                txt.append("RED đang bị chiếu tướng!");
+            }
+        }
     }
 
 

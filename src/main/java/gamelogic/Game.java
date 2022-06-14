@@ -9,11 +9,13 @@ import gamelogic.player.Player;
 import onlineFeature.Client;
 import onlineFeature.Server;
 
+import javax.swing.*;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 
-public class Game {
+public class Game implements PropertyChangeListener {
 
     Board board;
     Player player1;
@@ -28,6 +30,8 @@ public class Game {
     private Client client;
     private Server server;
 
+    private String listMoves = "";
+
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     public Game(GameTypeEnum gameType) {
@@ -38,35 +42,45 @@ public class Game {
         this.player1 = new Player("player1", Side.RED, 1, 5, false );
         this.player2 = new Player("player2", Side.BLACK, 1, 5, false);
 
+        this.currentPlayerTurn = player1;
+
         switch (gameType) {
             case BLACK_IS_COMPUTER:
                 this.player2.setComputer(true);
-                this.currentPlayerTurn = player1;
                 break;
             case P2P_OFFLINE:
-                this.currentPlayerTurn = player1;
                 break;
             case P2P_ONLINE_SERVER:
                 createServer();
-                createClient();
                 break;
             case P2P_ONLINE_CLIENT:
                 createClient();
                 break;
+            case P2P_ONLINE:
+                joinRoom(111);
+                break;
         }
-
 
 //        this.player1.startTimer();
     }
 
 
-    public void movePiece(int orgCol, int orgRow, int desCol, int desRow) {
+    public boolean movePiece(int orgCol, int orgRow, int desCol, int desRow) {
         if (board.onMovingPiece(currentPlayerTurn.getSide(),orgCol, orgRow, desCol, desRow)) {
+            saveTheMove(new Move(currentPlayerTurn.getSide(),orgCol, orgRow, desCol, desRow));
             updatePossibleMoves();
             shiftTurn();
             checkGameStatus();
-
+            return true;
         }
+        return false;
+
+    }
+
+    private void saveTheMove(Move move) {
+        listMoves += move.toDisplayString();
+
+        support.firePropertyChange("listMoveInTextFieldChanged", "", move.toDisplayString());
     }
 
     private void shiftTurn() {
@@ -77,7 +91,7 @@ public class Game {
             player2.startTimer();
 
             //            danh cho black la computer only
-            support.firePropertyChange("MoveChanged", "old ne", blackPossibleMoves);
+            support.firePropertyChange("possibleMovesForComputer", "old ne", blackPossibleMoves);
         } else {
 
             player2.stopTimer();
@@ -85,6 +99,10 @@ public class Game {
             player1.startTimer();
         }
 //        this.turn = this.turn == Side.RED ? Side.BLACK : Side.RED;
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
     }
 
     public void checkGameStatus() {
@@ -104,7 +122,11 @@ public class Game {
         if (isBeingCheck()) {
             System.out.println(currentPlayerTurn.getSide() + " dang bi checked");
             gameStatus = currentPlayerTurn.getSide() == Side.RED ? GameStatus.RED_BEING_CHECKED : GameStatus.BLACK_BEING_CHECKED;
+            support.firePropertyChange("isBeingChecked", "old ne", gameStatus);
+            return;
         }
+
+        gameStatus = GameStatus.PLAYING;
 
     }
 
@@ -144,24 +166,35 @@ public class Game {
         support.addPropertyChangeListener(l);
     }
 
-    private Server createServer() {
-        if (this.server == null) {
-            this.server = new Server();
-        }
-        Thread thread = new Thread(server);
-        thread.start();
+    private void createServer() {
 
-        return this.server;
+        server = new Server(this);
+        if (server.getServer() != null) {
+            Thread thread = new Thread(server);
+            thread.start();
+        } else {
+            server = null;
+        }
+
     }
 
-    private Client createClient() {
-        if (this.client == null) {
-            this.client = new Client();
-        }
+    private void createClient() {
+        client = new Client(this);
         Thread thread = new Thread(client);
         thread.start();
 
-        return this.client;
+    }
+
+    private void joinRoom(int port) {
+        createServer();
+        if (server == null) {
+            createClient();
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        System.out.println(evt.getNewValue());
     }
 
 
@@ -185,7 +218,17 @@ public class Game {
         return currentPlayerTurn;
     }
 
-    enum GameStatus {
+    public Client getClient() {
+        return client;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+
+
+    public enum GameStatus {
         PLAYING,
         RED_BEING_CHECKED,
         BLACK_BEING_CHECKED,

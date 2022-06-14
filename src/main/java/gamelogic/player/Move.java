@@ -2,7 +2,9 @@ package gamelogic.player;
 
 import gamelogic.board.Side;
 
-public class Move {
+import java.io.Serializable;
+
+public class Move implements Serializable {
 
     Side side;
     int orgCol;
@@ -25,7 +27,11 @@ public class Move {
                 ", orgRow=" + orgRow +
                 ", desCol=" + desCol +
                 ", desRow=" + desRow +
-                "}\n";
+                "}";
+    }
+
+    public String toDisplayString() {
+        return String.format("%s: [%d,%d] -> [%d,%d] \n", side.toString(), orgCol, orgRow, desCol, desRow);
     }
 
     public Side getSide() {

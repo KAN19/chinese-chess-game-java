@@ -1,44 +1,74 @@
 package onlineFeature;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import gamelogic.Game;
+import gamelogic.player.Move;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.*;
 import java.net.Socket;
 
-public class Client implements Runnable{
-
+public class Client implements Runnable, SocketHandler{
     private Socket client;
-    private BufferedReader in;
-    private PrintWriter out;
+    private ObjectInputStream objectInputStream;
+    private ObjectOutputStream objectOutputStream;
     private boolean done;
+
+    private Game game;
+
+    public Client(Game game) {
+        this.game = game;
+    }
 
     @Override
     public void run() {
         try{
             client = new Socket("127.0.0.1", 9999);
-            out = new PrintWriter(client.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            InputHandler inHandler = new InputHandler();
-            Thread t = new Thread(inHandler);
-            t.start();
+            objectOutputStream = new ObjectOutputStream(client.getOutputStream());
+            objectInputStream = new ObjectInputStream((client.getInputStream()));
 
-            String inMessage;
-            while((inMessage = in.readLine()) != null) {
-                System.out.println(inMessage);
+//            InputHandler inHandler = new InputHandler();
+//            Thread t = new Thread(inHandler);
+//            t.start();
+
+            Object inComingObject;
+            while((inComingObject = objectInputStream.readObject()) != null) {
+                Move move = (Move) inComingObject;
+//                System.out.println("Nhan tu server ne: " + move);
+                movePieceFromLAN(move);
             }
 
         } catch (IOException e) {
             shutdown();
+            client = null;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void movePieceFromLAN(Move move) {
+        if (game.movePiece(move.getOrgCol(), move.getOrgRow(), move.getDesCol(), move.getDesRow())) {
+            System.out.println("Move piece thanh cong");
+        } else {
+            System.out.println("Move that bai");
+        }
+    }
+
+    @Override
+    public void sendPieceMove(Move move) {
+        try {
+            objectOutputStream.writeObject(move);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void shutdown() {
         done = true;
         try {
-            in.close();
-            out.close();
+            objectInputStream.close();
+            objectOutputStream.close();
             if (!client.isClosed()) {
                 client.close();
             }
@@ -59,7 +89,7 @@ public class Client implements Runnable{
                         inReader.close();
                         shutdown();
                     } else {
-                        out.println(message);
+//                        out.println(message);
                     }
                }
             } catch (IOException e) {
@@ -68,4 +98,19 @@ public class Client implements Runnable{
         }
     }
 
+    public Socket getClient() {
+        return client;
+    }
+
+    public ObjectInputStream getObjectInputStream() {
+        return objectInputStream;
+    }
+
+    public ObjectOutputStream getObjectOutputStream() {
+        return objectOutputStream;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
 }

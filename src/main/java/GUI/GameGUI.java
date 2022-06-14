@@ -17,9 +17,17 @@ public class GameGUI {
         initCoreLogic();
     }
 
+    public GameGUI(GameTypeEnum gameTypeEnum, String name, int port) {
+        this.jFrame = initBasicComponentAttribute();
+
+        game = new Game(gameTypeEnum);
+
+        initCoreLogic();
+    }
+
     private JFrame initBasicComponentAttribute() {
         JFrame f = new JFrame("Chinese Chess");
-        f.setSize(1000, 800);
+        f.setSize(1000, 700);
         f.setLocation(0, 0);
         f.setLayout(null);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,7 +37,7 @@ public class GameGUI {
     }
 
     private void initCoreLogic() {
-        ChessBoardPanel cchessPanel = new ChessBoardPanel(game);
+        ChessBoardPanel cchessPanel = new ChessBoardPanel(game, jFrame);
         SideControlPanel sideControlPanel = new SideControlPanel(game);
 
         jFrame.add(cchessPanel);

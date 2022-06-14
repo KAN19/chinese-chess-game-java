@@ -1,4 +1,5 @@
 import GUI.GameMenu.MainMenu;
+import GUI.GameMenu.decorator.BackgroundImangePanel;
 
 import javax.swing.*;
 

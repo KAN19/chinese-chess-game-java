@@ -1,8 +1,8 @@
 package gamelogic.player;
 
-import constant.GameTypeEnum;
 import gamelogic.board.Side;
 import onlineFeature.Client;
+import onlineFeature.SocketHandler;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
@@ -25,6 +25,7 @@ public class Player {
 
     private boolean isComputer;
 
+    private SocketHandler socketActionManager;
 
     private String ddSecond, ddMinute;
     private final DecimalFormat dformat = new DecimalFormat("00");
@@ -71,7 +72,7 @@ public class Player {
     }
 
     public void setResult(String newValue) {
-        support.firePropertyChange("currentDuration", lastDuration, newValue);
+        support.firePropertyChange("currentDurationChanged", lastDuration, newValue);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -156,5 +157,13 @@ public class Player {
 
     public void setMinute(int minute) {
         this.minute = minute;
+    }
+
+    public void setSocketActionManager(SocketHandler socketActionManager) {
+        this.socketActionManager = socketActionManager;
+    }
+
+    public SocketHandler getSocketActionManager() {
+        return socketActionManager;
     }
 }
