@@ -20,7 +20,7 @@ public class GameGUI {
     public GameGUI(GameTypeEnum gameTypeEnum, String name, int port) {
         this.jFrame = initBasicComponentAttribute();
 
-        game = new Game(gameTypeEnum);
+        game = new Game(gameTypeEnum, name, port);
 
         initCoreLogic();
     }

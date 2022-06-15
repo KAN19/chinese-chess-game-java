@@ -32,6 +32,7 @@ public class SideControlPanel extends JPanel  implements MouseListener, Property
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        txt.setText("Đỏ đi trước!");
         this.add(jScrollPane);
         this.add(txt);
 

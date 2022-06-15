@@ -45,7 +45,7 @@ public class EnterNameMenu extends JFrame{
     }
 
     private void forwardTheMenu() {
-        JFrame frame = new RoomPickerMenu(playerNameInput.toString());
+        JFrame frame = new RoomPickerMenu(playerNameInput.getText());
         frame.setVisible(true);
         disposeAction();
     }

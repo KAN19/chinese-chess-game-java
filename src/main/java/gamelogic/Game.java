@@ -39,8 +39,10 @@ public class Game implements PropertyChangeListener {
         this.gameStatus = GameStatus.PLAYING;
         this.board = new Board();
 
-        this.player1 = new Player("player1", Side.RED, 1, 5, false );
-        this.player2 = new Player("player2", Side.BLACK, 1, 5, false);
+        this.player1 = new Player("player1", Side.RED, 25, 1, false );
+        player1.setNickname("");
+
+        this.player2 = new Player("player2", Side.BLACK, 25, 1, false);
 
         this.currentPlayerTurn = player1;
 
@@ -51,12 +53,36 @@ public class Game implements PropertyChangeListener {
             case P2P_OFFLINE:
                 break;
             case P2P_ONLINE:
-                joinRoom(111);
+                joinRoom(111, "kiet");
                 break;
         }
-
-//        this.player1.startTimer();
     }
+
+    public Game(GameTypeEnum gameType, String name, int port) {
+        this.gameType = gameType;
+        this.gameStatus = GameStatus.PLAYING;
+        this.board = new Board();
+
+        this.player1 = new Player("player1", Side.RED, 25, 1, false );
+
+        player1.setNickname(name);
+
+        this.player2 = new Player("player2", Side.BLACK, 25, 1, false);
+
+        this.currentPlayerTurn = player1;
+
+        switch (gameType) {
+            case BLACK_IS_COMPUTER:
+                this.player2.setComputer(true);
+                break;
+            case P2P_OFFLINE:
+                break;
+            case P2P_ONLINE:
+                joinRoom(port, name);
+                break;
+        }
+    }
+
 
 
     /**
@@ -95,18 +121,23 @@ public class Game implements PropertyChangeListener {
      */
     private void shiftTurn() {
         if (Objects.equals(this.currentPlayerTurn.getName(), "player1")) {
-
-            player1.stopTimer();
             this.currentPlayerTurn = player2;
-            player2.startTimer();
+
+            if (gameType != GameTypeEnum.BLACK_IS_COMPUTER && gameType != GameTypeEnum.RED_IS_COMPUTER) {
+                player1.stopTimer();
+                player2.startTimer();
+            }
 
             //            danh cho black la computer only
             support.firePropertyChange("possibleMovesForComputer", "old ne", blackPossibleMoves);
         } else {
 
-            player2.stopTimer();
             this.currentPlayerTurn = player1;
-            player1.startTimer();
+
+            if (gameType != GameTypeEnum.BLACK_IS_COMPUTER && gameType != GameTypeEnum.RED_IS_COMPUTER) {
+                player2.stopTimer();
+                player1.startTimer();
+            }
         }
 //        this.turn = this.turn == Side.RED ? Side.BLACK : Side.RED;
     }
@@ -204,7 +235,7 @@ public class Game implements PropertyChangeListener {
 
     }
 
-    private void joinRoom(int port) {
+    private void joinRoom(int port, String name) {
         createServer(port);
         if (server == null) {
             createClient(port);

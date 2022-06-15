@@ -1,5 +1,6 @@
 package GUI;
 
+import GUI.GameMenu.MainMenu;
 import constant.GameConstant;
 import gamelogic.Game;
 import gamelogic.board.Side;
@@ -195,8 +196,10 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
 
         if (game.getGameStatus() == Game.GameStatus.BLACK_WIN) {
             JOptionPane.showMessageDialog(jFrame, "Nguoi choi " + Side.BLACK + " chien thang!");
+            disposeAndCreateNewGame(jFrame);
         } else if (game.getGameStatus() == Game.GameStatus.RED_WIN){
             JOptionPane.showMessageDialog(jFrame, "Nguoi choi " + Side.RED + " chien thang!");
+            disposeAndCreateNewGame(jFrame);
         }
     }
 
@@ -231,6 +234,13 @@ public class ChessBoardPanel extends JPanel implements MouseListener, PropertyCh
                 }
             }
         }
+    }
+
+    private void disposeAndCreateNewGame(JFrame frame) {
+        jFrame.dispose();
+
+        JFrame jFrame = new MainMenu();
+        jFrame.setVisible(true);
     }
 
     @Override

@@ -32,6 +32,8 @@ public class Player {
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
+    private String nickname;
+
 
     public Player(String name, Side side, int minute, int second, boolean isComputer) {
         this.name = name;
@@ -126,6 +128,20 @@ public class Player {
     //    public void setSide(Side side) {
 //        this.side = side;
 //    }
+
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        if (nickname == null || nickname.equals("")) {
+            this.nickname = "Player";
+        } else {
+            this.nickname = nickname;
+        }
+
+    }
 
     public List<Move> getMoveList() {
         return moveList;

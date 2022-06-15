@@ -3,8 +3,6 @@ package GUI.GameMenu;
 import GUI.GameGUI;
 
 import GUI.GameMenu.EnterNameMenu.EnterNameMenu;
-import GUI.GameMenu.RoomPickerMenu.RoomPickerMenu;
-import GUI.GameMenu.decorator.BackgroundImangePanel;
 import constant.GameTypeEnum;
 
 import javax.swing.*;
@@ -55,9 +53,13 @@ public class MainMenu extends JFrame{
         seeRecord.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                displayMessageDialog("Chức năng còn đang phát triển, vui lòng quay lại sau!");
             }
         });
+    }
+
+    private void displayMessageDialog(String message) {
+        JOptionPane.showMessageDialog(this, message);
     }
 
     private void disposeAction() {
@@ -69,10 +71,6 @@ public class MainMenu extends JFrame{
 
         JFrame frame = new EnterNameMenu();
         frame.setVisible(true);
-    }
-
-    private void displayNameEntering() {
-
     }
 
 }
