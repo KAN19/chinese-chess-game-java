@@ -50,12 +50,6 @@ public class Game implements PropertyChangeListener {
                 break;
             case P2P_OFFLINE:
                 break;
-            case P2P_ONLINE_SERVER:
-                createServer();
-                break;
-            case P2P_ONLINE_CLIENT:
-                createClient();
-                break;
             case P2P_ONLINE:
                 joinRoom(111);
                 break;
@@ -65,6 +59,14 @@ public class Game implements PropertyChangeListener {
     }
 
 
+    /**
+     * move piece action executing by game controller. All the outside interaction should go through this.
+     * @param orgCol original column
+     * @param orgRow original row
+     * @param desCol destination column
+     * @param desRow destination row
+     * @return boolean if the move is executed successfully
+     */
     public boolean movePiece(int orgCol, int orgRow, int desCol, int desRow) {
         if (board.onMovingPiece(currentPlayerTurn.getSide(),orgCol, orgRow, desCol, desRow)) {
             saveTheMove(new Move(currentPlayerTurn.getSide(),orgCol, orgRow, desCol, desRow));
@@ -77,12 +79,20 @@ public class Game implements PropertyChangeListener {
 
     }
 
+
+    /**
+     * Save all the move of the game. Those moves will be requested to save after the game is end.
+     * @param move
+     */
     private void saveTheMove(Move move) {
         listMoves += move.toDisplayString();
 
         support.firePropertyChange("listMoveInTextFieldChanged", "", move.toDisplayString());
     }
 
+    /**
+     * shift the turn of the game. Based on the currentPlayerTurn attribute
+     */
     private void shiftTurn() {
         if (Objects.equals(this.currentPlayerTurn.getName(), "player1")) {
 
@@ -131,6 +141,10 @@ public class Game implements PropertyChangeListener {
     }
 
 
+    /**
+     * use the board and the coordination of 2 general to check if one side is being checked.
+     * @return true if the current player turn is being checked
+     */
     public boolean isBeingCheck () {
         General currentTurnGeneral = (General) board.getGeneral(currentPlayerTurn.getSide());
         return currentTurnGeneral
@@ -140,6 +154,11 @@ public class Game implements PropertyChangeListener {
     }
 
 
+    /**
+     * Update all possible moves of the 2 side of player.
+     * This function loop through all the pieces and calculate their possible moves.
+     * Then it accumulates them into one specific variable
+     */
     private void updatePossibleMoves() {
         redPossibleMoves.clear();
         blackPossibleMoves.clear();
@@ -166,9 +185,9 @@ public class Game implements PropertyChangeListener {
         support.addPropertyChangeListener(l);
     }
 
-    private void createServer() {
+    private void createServer(int port) {
 
-        server = new Server(this);
+        server = new Server(this, port);
         if (server.getServer() != null) {
             Thread thread = new Thread(server);
             thread.start();
@@ -178,17 +197,17 @@ public class Game implements PropertyChangeListener {
 
     }
 
-    private void createClient() {
-        client = new Client(this);
+    private void createClient(int port) {
+        client = new Client(this, port);
         Thread thread = new Thread(client);
         thread.start();
 
     }
 
     private void joinRoom(int port) {
-        createServer();
+        createServer(port);
         if (server == null) {
-            createClient();
+            createClient(port);
         }
     }
 

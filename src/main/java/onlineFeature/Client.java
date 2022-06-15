@@ -13,11 +13,13 @@ public class Client implements Runnable, SocketHandler{
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
     private boolean done;
+    private int port;
 
     private Game game;
 
-    public Client(Game game) {
+    public Client(Game game, int port) {
         this.game = game;
+        this.port = port;
     }
 
     @Override

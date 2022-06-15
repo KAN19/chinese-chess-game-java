@@ -4,7 +4,6 @@ import constant.GameConstant;
 import gamelogic.pieces.*;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class Board {
@@ -14,6 +13,9 @@ public class Board {
     private final Piece redGeneral;
     private final Piece blackGeneral;
 
+    /**
+     * Initialize a basic terminal chess game.
+     */
     public Board() {
         redGeneral = new General(4, 0, Side.RED, "red-general");
         blackGeneral = new General(4, 9, Side.BLACK, "black-general");
@@ -56,7 +58,17 @@ public class Board {
         return null;
     }
 
-        public boolean onMovingPiece(Side currentTurn, int orgCol, int orgRow, int desCol, int desRow) {
+
+    /**
+     * Move the piece from a coordinate to another. Use board object to interact with the piece.
+     * @param currentTurn current moving turn
+     * @param orgCol original column
+     * @param orgRow original row
+     * @param desCol destination col
+     * @param desRow destination row
+     * @return true if the move is executed
+     */
+    public boolean onMovingPiece(Side currentTurn, int orgCol, int orgRow, int desCol, int desRow) {
 
         Piece movingP = this.pieceAt(orgCol, orgRow);
         Piece targetP = this.pieceAt(desCol, desRow);
@@ -77,6 +89,16 @@ public class Board {
         return false;
     }
 
+
+    /**
+     * Move the piece. After the move, check if the general is being checked or not.
+     * If yes then revert the move
+     * @param orgCol original col
+     * @param orgRow original row
+     * @param desCol destination col
+     * @param desRow destination row
+     * @return true if the move is good
+     */
     public boolean canMoveWithoutBeingChecked(int orgCol, int orgRow, int desCol, int desRow) {
 //        Move the piece. If after moving, the general is not checked than return true
         boolean result = false;
@@ -96,7 +118,7 @@ public class Board {
                         currentTurnGeneral.getCol(),
                         currentTurnGeneral.getRow())
                 && !currentTurnGeneral.isGeneralExposed(this)) {
-           result = true;
+            result = true;
         }
 
         revertLastMove(movingP, targetP, orgCol, orgRow);
@@ -104,6 +126,13 @@ public class Board {
         return result;
     }
 
+    /**
+     * Revert last move.
+     * @param movedPiece the piece which is moved
+     * @param targetP the target piece. null if the move is just a move
+     * @param orgCol  original column
+     * @param orgRow  original row
+     */
     private void revertLastMove(Piece movedPiece, Piece targetP, int orgCol, int orgRow) {
         movedPiece.setCol(orgCol);
         movedPiece.setRow(orgRow);
@@ -112,17 +141,6 @@ public class Board {
         }
     }
 
-    private boolean isAnyEnemyCanMoveToGeneral(Board board, int desCol, int desRow) {
-//        Set<Piece> pieces = board.getPieces();
-//        for (Piece piece: pieces) {
-////            Kiem tra co phai enemy khong
-//            if (piece.getSide() != this.getSide()
-//                    && piece.canMove(board, desCol, desRow)) {
-//                return true;
-//            }
-//        }
-        return false;
-    }
 
     public void updatePossibleMovesOfPieces() {
         Piece[] arrayPieces = new Piece[pieces.size()];

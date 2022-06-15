@@ -14,12 +14,13 @@ public class Server implements Runnable, SocketHandler {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private boolean done;
-
+private int port;
     private Game game;
 
 
-    public Server(Game game) {
+    public Server(Game game, int port) {
         this.game = game;
+        this.port = port;
         done = false;
         try {
             server = new ServerSocket(9999);
